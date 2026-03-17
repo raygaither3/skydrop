@@ -13,3 +13,7 @@ def home():
 def create_db():
     db.create_all()
     return "Database tables created."
+
+@main_bp.route("/health")
+def health():
+    return "ok", 200
