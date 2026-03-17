@@ -6,8 +6,9 @@ main_bp = Blueprint("main", __name__)
 
 @main_bp.route("/")
 def home():
+    
     return render_template("home.html")
-
+    return "SkyDrop is live 🚁"
 
 @main_bp.route("/create-db")
 def create_db():
