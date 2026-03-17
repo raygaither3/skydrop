@@ -1,6 +1,3 @@
-from app import create_app
-
-app = create_app()
-
-if __name__ == "__main__":
-    app.run(debug=True)
+git add requirements.txt
+git commit -m "Add geopy dependency"
+git push
