@@ -3,7 +3,7 @@ from flask_login import current_user, login_required
 
 from app.extensions import db
 from app.models.delivery import Delivery
-from app.services.geocoding_service import get_coordinates_from_address
+from app.services.geocoding_services import get_coordinates_from_address
 from .forms import DeliveryForm
 
 deliveries_bp = Blueprint("deliveries", __name__, url_prefix="/deliveries")
