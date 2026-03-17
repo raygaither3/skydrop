@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Dispatch Board</h1>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card p-4 shadow-sm mb-4">
+                <h3 class="mb-3">Pending Deliveries</h3>
+
+                {% if pending_deliveries %}
+                    {% for delivery in pending_deliveries %}
+                        <div class="border rounded p-3 mb-3">
+                            <h5 class="mb-2">{{ delivery.order_number }} — {{ delivery.customer_name }}</h5>
+                            <p class="mb-1"><strong>Address:</strong> {{ delivery.customer_address }}</p>
+                            <p class="mb-1">
+                                <strong>Coordinates:</strong>
+                                {{ delivery.destination_lat }}, {{ delivery.destination_lng }}
+                            </p>
+                            <p class="mb-1"><strong>Priority:</strong> {{ delivery.priority }}</p>
+                            <p class="mb-2">
+                                <strong>Package Weight:</strong> {{ delivery.package_weight }}
+                            </p>
+
+                            <div class="mb-3">
+                                <a href="{{ url_for('dispatch.auto_assign_mission', delivery_id=delivery.id) }}"
+                                   class="btn btn-primary btn-sm">
+                                    Auto Assign
+                                </a>
+                            </div>
+
+                            <h6>Available Drones by Distance</h6>
+                            {% set options = delivery_drone_options.get(delivery.id, []) %}
+                            {% if options %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm align-middle">
+                                        <thead>
+                                            <tr>
+                                                <th>Drone</th>
+                                                <th>Status</th>
+                                                <th>Battery</th>
+                                                <th>Distance</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for item in options %}
+                                                <tr>
+                                                    <td>{{ item.drone.name }}</td>
+                                                    <td>{{ item.drone.status }}</td>
+                                                    <td>{{ item.drone.battery_level }}%</td>
+                                                    <td>
+                                                        {% if item.distance_miles is not none %}
+                                                            {{ item.distance_miles }} mi
+                                                        {% else %}
+                                                            N/A
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ url_for('dispatch.assign_mission', delivery_id=delivery.id, drone_id=item.drone.id) }}"
+                                                           class="btn btn-outline-primary btn-sm">
+                                                            Assign
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <p class="text-muted mb-0">No available drones.</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">No pending deliveries.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 shadow-sm">
+                <h3 class="mb-3">Active Missions</h3>
+
+                {% if active_missions %}
+                    {% for mission in active_missions %}
+                        <div class="border rounded p-3 mb-3">
+                            <h6 class="mb-1">Mission #{{ mission.id }}</h6>
+                            <p class="mb-1"><strong>Drone:</strong> {{ mission.drone.name }}</p>
+                            <p class="mb-1"><strong>Delivery:</strong> {{ mission.delivery.order_number }}</p>
+                            <p class="mb-2"><strong>Status:</strong> {{ mission.status }}</p>
+
+                            <a href="{{ url_for('dispatch.mission_detail', mission_id=mission.id) }}"
+                               class="btn btn-outline-secondary btn-sm">
+                                View Mission
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">No active missions.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

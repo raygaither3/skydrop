@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Mission Detail</h1>
+
+    <div class="card p-4 shadow-sm mb-4">
+        <h4 class="mb-3">Mission #{{ mission.id }}</h4>
+
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Status:</strong> {{ mission.status }}</p>
+                <p><strong>Drone:</strong> {{ mission.drone.name }}</p>
+                <p><strong>Drone Model:</strong> {{ mission.drone.model }}</p>
+                <p><strong>Battery:</strong> {{ mission.drone.battery_level }}%</p>
+                <p><strong>Delivery Order:</strong> {{ mission.delivery.order_number }}</p>
+                <p><strong>Customer:</strong> {{ mission.delivery.customer_name }}</p>
+                <p><strong>Address:</strong> {{ mission.delivery.customer_address }}</p>
+                <p><strong>Priority:</strong> {{ mission.delivery.priority }}</p>
+                <p><strong>Dispatch Score:</strong> {{ mission.dispatch_score or "N/A" }}</p>
+                <p><strong>Distance:</strong> {{ distance_miles or "N/A" }} miles</p>
+                <p><strong>Notes:</strong> {{ mission.dispatch_notes or "None" }}</p>
+            </div>
+
+            <div class="col-md-6">
+                <p><strong>Hub Coordinates:</strong> {{ hub_lat }}, {{ hub_lng }}</p>
+                <p><strong>Drone Coordinates:</strong> {{ drone_pos[0] }}, {{ drone_pos[1] }}</p>
+                <p><strong>Delivery Coordinates:</strong> {{ delivery_pos[0] }}, {{ delivery_pos[1] }}</p>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            {% if mission.status == "assigned" %}
+                <a href="{{ url_for('dispatch.launch_mission', mission_id=mission.id) }}"
+                   class="btn btn-primary">
+                    Launch Mission
+                </a>
+            {% endif %}
+
+            {% if mission.status == "in_flight" %}
+                <a href="{{ url_for('dispatch.complete_mission', mission_id=mission.id) }}"
+                   class="btn btn-success">
+                    Complete Mission
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <h4 class="mb-3">Mission Map</h4>
+        <div id="mission-map" style="height: 450px; border-radius: 12px; overflow: hidden;"></div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const hubLat = {{ hub_lat|tojson }};
+    const hubLng = {{ hub_lng|tojson }};
+    const droneLat = {{ drone_pos[0]|tojson }};
+    const droneLng = {{ drone_pos[1]|tojson }};
+    const deliveryLat = {{ delivery_pos[0]|tojson }};
+    const deliveryLng = {{ delivery_pos[1]|tojson }};
+
+    const map = L.map("mission-map").setView([deliveryLat, deliveryLng], 13);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const hubMarker = L.marker([hubLat, hubLng]).addTo(map).bindPopup("Hub");
+    const droneMarker = L.marker([droneLat, droneLng]).addTo(map).bindPopup("Drone");
+    const deliveryMarker = L.marker([deliveryLat, deliveryLng]).addTo(map).bindPopup("Delivery");
+
+    const droneToDeliveryLine = L.polyline([
+        [droneLat, droneLng],
+        [deliveryLat, deliveryLng]
+    ]).addTo(map);
+
+    const hubToDeliveryLine = L.polyline([
+        [hubLat, hubLng],
+        [deliveryLat, deliveryLng]
+    ]).addTo(map);
+
+    const group = L.featureGroup([
+        hubMarker,
+        droneMarker,
+        deliveryMarker,
+        droneToDeliveryLine,
+        hubToDeliveryLine
+    ]);
+
+    map.fitBounds(group.getBounds().pad(0.2));
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 250);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">SkyDrop Dashboard</h1>
+
+<div class="card p-3 mb-4 shadow-sm">
+    <h5 class="mb-1">Welcome, {{ user.name }}</h5>
+    <p class="mb-0 text-muted">Role: {{ user.role }}</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6 class="text-muted">Pending Deliveries</h6>
+            <h2>{{ pending_deliveries_count }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6 class="text-muted">Active Missions</h6>
+            <h2>{{ active_missions_count }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6 class="text-muted">Available Drones</h6>
+            <h2>{{ available_drones_count }}</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6 class="text-muted">Delivered</h6>
+            <h2>{{ delivered_count }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mb-4 shadow-sm">
+    <h4 class="mb-3">Quick Actions</h4>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('deliveries.create_delivery') }}" class="btn btn-primary">Create Delivery</a>
+        <a href="{{ url_for('deliveries.delivery_list') }}" class="btn btn-outline-secondary">View Deliveries</a>
+        <a href="{{ url_for('fleet.fleet_list') }}" class="btn btn-outline-dark">View Fleet</a>
+        <a href="{{ url_for('dispatch.dispatch_board') }}" class="btn btn-outline-primary">Dispatch Board</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card p-3 shadow-sm h-100">
+            <h4 class="mb-3">Recent Deliveries</h4>
+
+            {% if recent_deliveries %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Customer</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for delivery in recent_deliveries %}
+                            <tr>
+                                <td>{{ delivery.order_number }}</td>
+                                <td>{{ delivery.customer_name }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if delivery.status == 'pending' %}bg-secondary
+                                        {% elif delivery.status == 'assigned' %}bg-primary
+                                        {% elif delivery.status == 'in_flight' %}bg-warning text-dark
+                                        {% elif delivery.status == 'delivered' %}bg-success
+                                        {% else %}bg-dark
+                                        {% endif %}">
+                                        {{ delivery.status.replace('_', ' ').title() }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0 text-muted">No deliveries yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card p-3 shadow-sm h-100">
+            <h4 class="mb-3">Recent Missions</h4>
+
+            {% if recent_missions %}
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Delivery</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for mission in recent_missions %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('dispatch.mission_detail', mission_id=mission.id) }}">
+                                        #{{ mission.id }}
+                                    </a>
+                                </td>
+                                <td>{{ mission.delivery.order_number }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if mission.status == 'assigned' %}bg-primary
+                                        {% elif mission.status == 'in_flight' %}bg-warning text-dark
+                                        {% elif mission.status == 'delivered' %}bg-success
+                                        {% else %}bg-dark
+                                        {% endif %}">
+                                        {{ mission.status.replace('_', ' ').title() }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="mb-0 text-muted">No missions yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

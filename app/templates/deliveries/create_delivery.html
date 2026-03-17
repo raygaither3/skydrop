@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Create Delivery</h1>
+
+    <div class="card p-4 shadow-sm">
+        <div class="alert alert-info mb-4">
+            Enter the customer address and place the delivery pin on the map.
+            <br>
+            <small class="text-muted">
+                The marker can be dragged to the exact drop location.
+            </small>
+        </div>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                {{ form.order_number.label(class="form-label") }}
+                {{ form.order_number(class="form-control", placeholder="e.g. ORD-1001") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.customer_name.label(class="form-label") }}
+                {{ form.customer_name(class="form-control", placeholder="Customer full name") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.customer_address.label(class="form-label") }}
+                {{ form.customer_address(
+                    class="form-control",
+                    placeholder="123 Nelson Rd, Lake Charles, LA",
+                    id="customer_address"
+                ) }}
+                <small class="text-muted">Enter the full address, then click "Find Address".</small>
+            </div>
+
+            <div class="mb-3">
+                <button type="button" class="btn btn-outline-primary" id="find-address-btn">
+                    Find Address
+                </button>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Drop Location Map</label>
+                <div id="delivery-map" style="height: 400px; border-radius: 12px; overflow: hidden;"></div>
+                <small class="text-muted d-block mt-2">
+                    Drag the marker to the exact delivery point.
+                </small>
+            </div>
+
+            <div class="mb-3">
+                {{ form.customer_phone.label(class="form-label") }}
+                {{ form.customer_phone(class="form-control", placeholder="Optional") }}
+            </div>
+
+            <div class="mb-3">
+                {{ form.package_weight.label(class="form-label") }}
+                {{ form.package_weight(class="form-control", placeholder="Weight in lbs (optional)") }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    {{ form.destination_lat.label(class="form-label") }}
+                    {{ form.destination_lat(class="form-control", id="destination_lat", readonly=True) }}
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    {{ form.destination_lng.label(class="form-label") }}
+                    {{ form.destination_lng(class="form-control", id="destination_lng", readonly=True) }}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                {{ form.submit(class="btn btn-primary w-100") }}
+            </div>
+        </form>
+    </div>
+</div>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const latInput = document.getElementById("destination_lat");
+    const lngInput = document.getElementById("destination_lng");
+    const addressInput = document.getElementById("customer_address");
+    const findAddressBtn = document.getElementById("find-address-btn");
+
+    // Default center: Lake Charles
+    const defaultLat = 30.2266;
+    const defaultLng = -93.2174;
+
+    const map = L.map("delivery-map").setView([defaultLat, defaultLng], 13);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+
+    const marker = L.marker([defaultLat, defaultLng], {
+        draggable: true
+    }).addTo(map);
+
+    function updateInputs(lat, lng) {
+        latInput.value = Number(lat).toFixed(6);
+        lngInput.value = Number(lng).toFixed(6);
+    }
+
+    updateInputs(defaultLat, defaultLng);
+
+    marker.on("dragend", function (event) {
+        const position = event.target.getLatLng();
+        updateInputs(position.lat, position.lng);
+    });
+
+    map.on("click", function (event) {
+        marker.setLatLng(event.latlng);
+        updateInputs(event.latlng.lat, event.latlng.lng);
+    });
+
+    findAddressBtn.addEventListener("click", async function () {
+        const address = addressInput.value.trim();
+
+        if (!address) {
+            alert("Please enter an address first.");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/deliveries/geocode?address=${encodeURIComponent(address)}`);
+            const data = await response.json();
+
+            if (!data.success) {
+                alert(data.message || "Address not found.");
+                return;
+            }
+
+            const lat = data.lat;
+            const lng = data.lng;
+
+            map.setView([lat, lng], 17);
+            marker.setLatLng([lat, lng]);
+            updateInputs(lat, lng);
+        } catch (error) {
+            console.error("Geocoding error:", error);
+            alert("There was a problem finding that address.");
+        }
+    });
+
+    // Fix Leaflet sizing inside Bootstrap/card layouts
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 200);
+});
+</script>
+{% endblock %}

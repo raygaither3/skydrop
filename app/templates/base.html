@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyDrop</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg skydrop-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="{{ url_for('main.home') }}">
+            <img src="{{ url_for('static', filename='img/skydrop-logo.png') }}"
+                 alt="SkyDrop Logo"
+                 class="nav-logo">
+            <span>SkyDrop</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('main.home') }}">Home</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('map.operations_map') }}">Map</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard.home') }}">Dashboard</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('deliveries.delivery_list') }}">Deliveries</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('fleet.fleet_list') }}">Fleet</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dispatch.dispatch_board') }}">Dispatch</a>
+                </li>
+
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-light btn-sm nav-login-btn" href="{{ url_for('auth.logout') }}">
+                            Logout
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-primary btn-sm nav-login-btn" href="{{ url_for('auth.login') }}">
+                            Login
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="container mt-3">
+            {% for category, message in messages %}
+                <div class="alert alert-dismissible fade show
+                    {% if category == 'success' %}alert-success
+                    {% elif category == 'warning' %}alert-warning
+                    {% elif category == 'danger' %}alert-danger
+                    {% elif category == 'info' %}alert-info
+                    {% else %}alert-secondary
+                    {% endif %}" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endwith %}
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="container">
+        <div class="row gy-3 align-items-center">
+            <div class="col-md-6">
+                <div class="footer-brand d-flex align-items-center gap-2">
+                    <img src="{{ url_for('static', filename='img/skydrop-logo.png') }}"
+                         alt="SkyDrop Logo"
+                         class="footer-logo">
+                    <span class="fw-bold">SkyDrop</span>
+                </div>
+                <p class="footer-text mt-2 mb-0">
+                    Drone delivery logistics platform built for Lake Charles.
+                </p>
+            </div>
+
+            <div class="col-md-6 text-md-end">
+                <div class="footer-links d-flex flex-wrap justify-content-md-end gap-3">
+                    <a href="{{ url_for('main.home') }}">Home</a>
+                    <a href="{{ url_for('map.operations_map') }}">Map</a>
+                    <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
+                    <a href="{{ url_for('dispatch.dispatch_board') }}">Dispatch</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

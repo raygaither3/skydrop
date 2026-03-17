@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="mb-4">SkyDrop Operations Map</h1>
+
+<div class="card p-3 shadow-sm mb-4">
+    <p class="mb-0">
+        Live operations view centered on <strong>Lake Charles, Louisiana</strong>.
+    </p>
+</div>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div id="map" style="height: 650px; border-radius: 12px;"></div>
+    </div>
+
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h4 class="mb-3">Mission Control</h4>
+
+                {% if missions %}
+                    {% for mission in missions %}
+                        <div class="border rounded p-3 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <strong>Mission #{{ mission.id }}</strong>
+                                <span class="badge
+                                    {% if mission.status == 'assigned' %}bg-primary
+                                    {% elif mission.status == 'in_flight' %}bg-warning text-dark
+                                    {% elif mission.status == 'delivered' %}bg-success
+                                    {% else %}bg-secondary
+                                    {% endif %}">
+                                    {{ mission.status.replace('_', ' ').title() }}
+                                </span>
+                            </div>
+
+                            <p class="mb-1"><strong>Drone:</strong> {{ mission.drone.name }}</p>
+                            <p class="mb-1"><strong>Model:</strong> {{ mission.drone.model }}</p>
+                            <p class="mb-1"><strong>Order:</strong> {{ mission.delivery.order_number }}</p>
+                            <p class="mb-1"><strong>Customer:</strong> {{ mission.delivery.customer_name }}</p>
+                            <p class="mb-1"><strong>Address:</strong> {{ mission.delivery.customer_address }}</p>
+                            <p class="mb-1"><strong>Weight:</strong> {{ mission.delivery.package_weight }} lbs</p>
+                            <p class="mb-0"><strong>Battery:</strong> {{ mission.drone.battery_level }}%</p>
+
+                            <div class="mt-3 d-flex gap-2 flex-wrap">
+                                <a href="{{ url_for('dispatch.mission_detail', mission_id=mission.id) }}"
+                                   class="btn btn-sm btn-outline-secondary">
+                                    View Mission
+                                </a>
+
+                                {% if mission.status == "assigned" %}
+                                    <a href="{{ url_for('dispatch.launch_mission', mission_id=mission.id) }}"
+                                       class="btn btn-sm btn-warning">
+                                        Launch
+                                    </a>
+                                {% endif %}
+
+                                {% if mission.status == "in_flight" %}
+                                    <a href="{{ url_for('dispatch.complete_mission', mission_id=mission.id) }}"
+                                       class="btn btn-sm btn-success">
+                                        Complete
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted mb-0">No missions yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const hubLat = {{ hub.lat }};
+    const hubLng = {{ hub.lng }};
+
+    const map = L.map('map').setView([hubLat, hubLng], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Hub marker
+    L.marker([hubLat, hubLng]).addTo(map)
+        .bindPopup("<strong>{{ hub.name }}</strong><br>Primary launch hub");
+
+    function createDroneIcon(color) {
+        return L.divIcon({
+            className: '',
+            html: `
+                <div style="
+                    width: 18px;
+                    height: 18px;
+                    background: ${color};
+                    border: 2px solid white;
+                    border-radius: 50%;
+                    box-shadow: 0 0 6px rgba(0,0,0,0.35);
+                "></div>
+            `,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9]
+        });
+    }
+
+    // Delivery markers
+    {% for delivery in deliveries %}
+        {% if delivery.destination_lat is not none and delivery.destination_lng is not none %}
+            L.circleMarker([{{ delivery.destination_lat }}, {{ delivery.destination_lng }}], {
+                radius: 8,
+                color: "#0d6efd",
+                fillColor: "#0d6efd",
+                fillOpacity: 0.75
+            }).addTo(map)
+                .bindPopup(
+                    "<strong>Delivery {{ delivery.order_number }}</strong><br>" +
+                    "Customer: {{ delivery.customer_name }}<br>" +
+                    "Status: {{ delivery.status }}<br>" +
+                    "Address: {{ delivery.customer_address }}"
+                );
+        {% endif %}
+    {% endfor %}
+
+    // Mission route lines
+    {% for mission in missions %}
+        {% if mission.delivery.destination_lat is not none and mission.delivery.destination_lng is not none %}
+            L.polyline([
+                [hubLat, hubLng],
+                [{{ mission.delivery.destination_lat }}, {{ mission.delivery.destination_lng }}]
+            ], {
+                color:
+                    {% if mission.status == "assigned" %}
+                        "blue"
+                    {% elif mission.status == "in_flight" %}
+                        "orange"
+                    {% elif mission.status == "delivered" %}
+                        "green"
+                    {% else %}
+                        "gray"
+                    {% endif %}
+                ,
+                weight: 4,
+                opacity: 0.7,
+                dashArray:
+                    {% if mission.status == "assigned" %}
+                        "8, 8"
+                    {% else %}
+                        null
+                    {% endif %}
+            }).addTo(map).bindPopup(
+                "<strong>Mission #{{ mission.id }}</strong><br>" +
+                "Delivery: {{ mission.delivery.order_number }}<br>" +
+                "Drone: {{ mission.drone.name }}<br>" +
+                "Status: {{ mission.status.replace('_', ' ').title() }}"
+            );
+        {% endif %}
+    {% endfor %}
+
+    // Static drone markers for drones not currently flying
+    {% for drone in drones %}
+        {% if drone.current_lat is not none and drone.current_lng is not none and drone.status != "in_flight" %}
+            L.marker(
+                [{{ drone.current_lat }}, {{ drone.current_lng }}],
+                {
+                    icon: createDroneIcon(
+                        {% if drone.status == "idle" %}
+                            "green"
+                        {% elif drone.status == "assigned" %}
+                            "blue"
+                        {% elif drone.status == "charging" %}
+                            "cyan"
+                        {% elif drone.status == "maintenance" %}
+                            "red"
+                        {% else %}
+                            "gray"
+                        {% endif %}
+                    )
+                }
+            ).addTo(map).bindPopup(
+                "<strong>{{ drone.name }}</strong><br>" +
+                "Model: {{ drone.model }}<br>" +
+                "Status: {{ drone.status.replace('_', ' ').title() }}<br>" +
+                "Battery: {{ drone.battery_level }}%"
+            );
+        {% endif %}
+    {% endfor %}
+
+    // Animated drones for in-flight missions
+    const animatedFlights = [
+        {% for mission in missions %}
+            {% if mission.status == "in_flight" and mission.delivery.destination_lat is not none and mission.delivery.destination_lng is not none %}
+            {
+                droneName: "{{ mission.drone.name }}",
+                model: "{{ mission.drone.model }}",
+                battery: "{{ mission.drone.battery_level }}",
+                startLat: hubLat,
+                startLng: hubLng,
+                endLat: {{ mission.delivery.destination_lat }},
+                endLng: {{ mission.delivery.destination_lng }},
+                deliveryOrder: "{{ mission.delivery.order_number }}",
+                missionId: "{{ mission.id }}"
+            },
+            {% endif %}
+        {% endfor %}
+    ];
+
+    function animateRoundTrip(flight) {
+        const marker = L.marker(
+            [flight.startLat, flight.startLng],
+            { icon: createDroneIcon("orange") }
+        ).addTo(map);
+
+        let phase = "outbound";
+        let progress = 0;
+
+        function updatePopup(statusText) {
+            marker.bindPopup(
+                `<strong>${flight.droneName}</strong><br>` +
+                `Model: ${flight.model}<br>` +
+                `Status: ${statusText}<br>` +
+                `Mission: #${flight.missionId}<br>` +
+                `Delivery: ${flight.deliveryOrder}<br>` +
+                `Battery: ${flight.battery}%`
+            );
+        }
+
+        updatePopup("In Flight to Delivery");
+
+        const interval = setInterval(() => {
+            progress += 0.01;
+
+            if (phase === "outbound") {
+                const currentLat = flight.startLat + (flight.endLat - flight.startLat) * progress;
+                const currentLng = flight.startLng + (flight.endLng - flight.startLng) * progress;
+                marker.setLatLng([currentLat, currentLng]);
+
+                if (progress >= 1) {
+                    phase = "pause_at_delivery";
+                    progress = 0;
+                    updatePopup("Package Delivered - Preparing Return");
+                    setTimeout(() => {
+                        phase = "return";
+                        progress = 0;
+                        updatePopup("Returning to Hub");
+                    }, 1500);
+                }
+            } else if (phase === "return") {
+                const currentLat = flight.endLat + (flight.startLat - flight.endLat) * progress;
+                const currentLng = flight.endLng + (flight.startLng - flight.endLng) * progress;
+                marker.setLatLng([currentLat, currentLng]);
+
+                if (progress >= 1) {
+                    clearInterval(interval);
+                    marker.setLatLng([flight.startLat, flight.startLng]);
+                    marker.setIcon(createDroneIcon("green"));
+                    updatePopup("Returned to Hub");
+                }
+            }
+        }, 120);
+    }
+
+    animatedFlights.forEach(flight => {
+        animateRoundTrip(flight);
+    });
+</script>
+{% endblock %}

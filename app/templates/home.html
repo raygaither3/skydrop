@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="public-hero">
+    <div class="container">
+        <div class="row align-items-center hero-row">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="hero-logo-wrap mb-4">
+                    <img src="{{ url_for('static', filename='img/skydrop-logo.png') }}"
+                         alt="SkyDrop Logo"
+                         class="hero-logo">
+                </div>
+
+                <span class="hero-eyebrow">Drone Delivery for Lake Charles</span>
+
+                <h1 class="public-hero-title mt-3">
+                    Faster local delivery, built for the future.
+                </h1>
+
+                <p class="public-hero-text mt-3">
+                    SkyDrop is building a smarter way to move small packages across Lake Charles —
+                    combining drone technology, real-time dispatch, and modern logistics software
+                    into one fast local delivery platform.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a href="{{ url_for('map.operations_map') }}" class="btn btn-primary btn-lg public-btn-primary">
+                        View Live Operations
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline-primary btn-lg public-btn-secondary">
+                        Operator Login
+                    </a>
+                </div>
+
+                <div class="hero-trust-row mt-4">
+                    <span>Lake Charles Focused</span>
+                    <span>Fast Local Logistics</span>
+                    <span>Built for Real Operations</span>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="hero-visual-card">
+                    <div class="hero-visual-top">
+                        <div>
+                            <p class="visual-label">SkyDrop Network</p>
+                            <h4 class="mb-1">Lake Charles Service Hub</h4>
+                            <p class="visual-subtext mb-0">Autonomous drone logistics platform</p>
+                        </div>
+                        <span class="live-pill">Live</span>
+                    </div>
+
+                    <div class="hero-image-wrap mt-4">
+                        <img src="{{ url_for('static', filename='img/hero-drone.png') }}"
+                             alt="SkyDrop Delivery Drone"
+                             class="hero-drone-img">
+                    </div>
+
+                    <div class="hero-metric-grid mt-4">
+                        <div class="metric-box">
+                            <p>Service Area</p>
+                            <h3>Lake Charles</h3>
+                        </div>
+                        <div class="metric-box">
+                            <p>Delivery Type</p>
+                            <h3>Local Drone</h3>
+                        </div>
+                        <div class="metric-box">
+                            <p>System</p>
+                            <h3>SkyDrop Ops</h3>
+                        </div>
+                        <div class="metric-box">
+                            <p>Model</p>
+                            <h3>Hub-Based</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="brand-strip">
+    <div class="container">
+        <div class="brand-strip-inner">
+            <span>Drone Logistics</span>
+            <span>Dispatch + Fleet Control</span>
+            <span>Live Mission Tracking</span>
+            <span>Built in Lake Charles</span>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="container">
+        <div class="section-header text-center">
+            <span class="section-tag">How It Works</span>
+            <h2>Simple request. Smart dispatch. Fast delivery.</h2>
+            <p>
+                SkyDrop connects delivery requests, operator oversight, drone assignment,
+                and live mission tracking in one system.
+            </p>
+        </div>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-4">
+                <div class="info-card h-100">
+                    <div class="info-number">01</div>
+                    <h4>Request</h4>
+                    <p>
+                        A delivery request enters the system through the website or a partner business portal.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-card h-100">
+                    <div class="info-number">02</div>
+                    <h4>Dispatch</h4>
+                    <p>
+                        SkyDrop assigns an available drone, creates a mission, and tracks it in real time.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="info-card h-100">
+                    <div class="info-number">03</div>
+                    <h4>Deliver</h4>
+                    <p>
+                        The drone completes the route, the mission updates on the operations map, and the system logs the result.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block section-soft">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <span class="section-tag">Why SkyDrop</span>
+                <h2 class="mb-4">Built to become a real delivery service, not just a demo.</h2>
+
+                <div class="benefit-stack">
+                    <div class="benefit-card">
+                        <h5>Local-first deployment</h5>
+                        <p>
+                            SkyDrop is being designed specifically around real Lake Charles operations and service routes.
+                        </p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h5>Operations platform already working</h5>
+                        <p>
+                            The backend already supports deliveries, fleet management, dispatch, missions, and live mapping.
+                        </p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <h5>Ready to connect to real hardware</h5>
+                        <p>
+                            The platform is structured to support real drones, future telemetry, and live business delivery workflows.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="use-case-panel">
+                    <span class="section-tag">Use Cases</span>
+                    <h3 class="mt-2 mb-4">Who SkyDrop can serve</h3>
+
+                    <div class="chip-group">
+                        <span class="use-chip">Pharmacy</span>
+                        <span class="use-chip">Retail</span>
+                        <span class="use-chip">Urgent Delivery</span>
+                        <span class="use-chip">Medical Items</span>
+                        <span class="use-chip">Local Commerce</span>
+                        <span class="use-chip">Business Logistics</span>
+                    </div>
+
+                    <div class="mini-callout mt-4">
+                        Designed for fast, small, point-to-point deliveries where time and local coverage matter.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-block">
+    <div class="container">
+        <div class="cta-panel text-center">
+            <span class="section-tag">SkyDrop Lake Charles</span>
+            <h2 class="mt-2 mb-3">The future of local delivery starts with strong software and real operations.</h2>
+            <p class="mb-4">
+                SkyDrop already has the platform foundation in place. The next phase is public ordering,
+                business partnerships, and real-world deployment.
+            </p>
+
+            <div class="d-flex justify-content-center flex-wrap gap-3">
+                <a href="{{ url_for('map.operations_map') }}" class="btn btn-primary btn-lg public-btn-primary">
+                    View Operations Map
+                </a>
+                <a href="{{ url_for('dispatch.dispatch_board') }}" class="btn btn-outline-primary btn-lg public-btn-secondary">
+                    Open Dispatch
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
