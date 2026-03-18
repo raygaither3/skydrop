@@ -13,5 +13,22 @@ class User(UserMixin, db.Model):
 
     deliveries = db.relationship("Delivery", backref="created_by", lazy=True)
 
+    @staticmethod
+    def normalize_email(email):
+        return email.strip().lower() if email else email
+
+    def __init__(self, **kwargs):
+        if "email" in kwargs and kwargs["email"]:
+            kwargs["email"] = self.normalize_email(kwargs["email"])
+        super().__init__(**kwargs)
+
+    @property
+    def is_admin(self):
+        return self.role == "admin"
+
+    @property
+    def is_staff(self):
+        return self.role in ["admin", "business_staff"]
+
     def __repr__(self):
         return f"<User {self.email}>"

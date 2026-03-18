@@ -1,23 +1,24 @@
 from flask import Blueprint, flash, redirect, render_template, url_for, request, jsonify
-from flask_login import current_user, login_required
+from flask_login import current_user
 
 from app.extensions import db
 from app.models.delivery import Delivery
 from app.services.geocoding_services import get_coordinates_from_address
+from app.utils.decorators import role_required
 from .forms import DeliveryForm
 
 deliveries_bp = Blueprint("deliveries", __name__, url_prefix="/deliveries")
 
 
 @deliveries_bp.route("/")
-@login_required
+@role_required("admin", "business_staff")
 def delivery_list():
     deliveries = Delivery.query.order_by(Delivery.created_at.desc()).all()
     return render_template("deliveries/delivery_list.html", deliveries=deliveries)
 
 
 @deliveries_bp.route("/create", methods=["GET", "POST"])
-@login_required
+@role_required("admin", "business_staff")
 def create_delivery():
     form = DeliveryForm()
 
@@ -64,7 +65,7 @@ def create_delivery():
 
 
 @deliveries_bp.route("/geocode")
-@login_required
+@role_required("admin", "business_staff")
 def geocode_address():
     address = request.args.get("address", "").strip()
 

@@ -1,15 +1,16 @@
 from flask import Blueprint, render_template
-from flask_login import login_required, current_user
+from flask_login import current_user
 
 from app.models.delivery import Delivery
 from app.models.drone import Drone
 from app.models.mission import Mission
+from app.utils.decorators import role_required
 
 dashboard_bp = Blueprint("dashboard", __name__, url_prefix="/dashboard")
 
 
 @dashboard_bp.route("/")
-@login_required
+@role_required("admin", "business_staff")
 def home():
     pending_deliveries_count = Delivery.query.filter_by(status="pending").count()
 

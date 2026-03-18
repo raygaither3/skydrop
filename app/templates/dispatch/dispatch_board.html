@@ -23,15 +23,19 @@
                                 <strong>Package Weight:</strong> {{ delivery.package_weight }}
                             </p>
 
-                            <div class="mb-3">
-                                <a href="{{ url_for('dispatch.auto_assign_mission', delivery_id=delivery.id) }}"
-                                   class="btn btn-primary btn-sm">
-                                    Auto Assign
-                                </a>
-                            </div>
+                            <!-- Auto Assign (staff + admin) -->
+                            {% if current_user.is_staff %}
+                                <div class="mb-3">
+                                    <a href="{{ url_for('dispatch.auto_assign_mission', delivery_id=delivery.id) }}"
+                                       class="btn btn-primary btn-sm">
+                                        Auto Assign
+                                    </a>
+                                </div>
+                            {% endif %}
 
                             <h6>Available Drones by Distance</h6>
                             {% set options = delivery_drone_options.get(delivery.id, []) %}
+
                             {% if options %}
                                 <div class="table-responsive">
                                     <table class="table table-sm align-middle">
@@ -41,7 +45,9 @@
                                                 <th>Status</th>
                                                 <th>Battery</th>
                                                 <th>Distance</th>
-                                                <th></th>
+                                                {% if current_user.is_staff %}
+                                                    <th></th>
+                                                {% endif %}
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -57,12 +63,15 @@
                                                             N/A
                                                         {% endif %}
                                                     </td>
-                                                    <td>
-                                                        <a href="{{ url_for('dispatch.assign_mission', delivery_id=delivery.id, drone_id=item.drone.id) }}"
-                                                           class="btn btn-outline-primary btn-sm">
-                                                            Assign
-                                                        </a>
-                                                    </td>
+
+                                                    {% if current_user.is_staff %}
+                                                        <td>
+                                                            <a href="{{ url_for('dispatch.assign_mission', delivery_id=delivery.id, drone_id=item.drone.id) }}"
+                                                               class="btn btn-outline-primary btn-sm">
+                                                                Assign
+                                                            </a>
+                                                        </td>
+                                                    {% endif %}
                                                 </tr>
                                             {% endfor %}
                                         </tbody>

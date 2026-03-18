@@ -1,21 +1,21 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
-from flask_login import login_required
+from flask import Blueprint, flash, redirect, render_template, url_for
 
 from app.extensions import db
 from app.models.drone import Drone
+from app.utils.decorators import role_required
 
 fleet_bp = Blueprint("fleet", __name__, url_prefix="/fleet")
 
 
 @fleet_bp.route("/")
-@login_required
+@role_required("admin", "business_staff")
 def fleet_list():
     drones = Drone.query.order_by(Drone.name.asc()).all()
     return render_template("fleet/fleet_list.html", drones=drones)
 
 
 @fleet_bp.route("/seed")
-@login_required
+@role_required("admin")
 def seed_drones():
     if Drone.query.count() > 0:
         flash("Drones already exist.", "warning")

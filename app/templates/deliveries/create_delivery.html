@@ -2,7 +2,12 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="mb-4">Create Delivery</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Create Delivery</h1>
+        <a href="{{ url_for('deliveries.delivery_list') }}" class="btn btn-outline-secondary">
+            Back to Deliveries
+        </a>
+    </div>
 
     <div class="card p-4 shadow-sm">
         <div class="alert alert-info mb-4">
@@ -72,8 +77,11 @@
                 </div>
             </div>
 
-            <div class="mt-4">
-                {{ form.submit(class="btn btn-primary w-100") }}
+            <div class="mt-4 d-flex gap-2">
+                <a href="{{ url_for('deliveries.delivery_list') }}" class="btn btn-outline-secondary w-50">
+                    Cancel
+                </a>
+                {{ form.submit(class="btn btn-primary w-50") }}
             </div>
         </form>
     </div>
@@ -92,7 +100,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const addressInput = document.getElementById("customer_address");
     const findAddressBtn = document.getElementById("find-address-btn");
 
-    // Default center: Lake Charles
     const defaultLat = 30.2266;
     const defaultLng = -93.2174;
 
@@ -153,7 +160,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // Fix Leaflet sizing inside Bootstrap/card layouts
     setTimeout(() => {
         map.invalidateSize();
     }, 200);

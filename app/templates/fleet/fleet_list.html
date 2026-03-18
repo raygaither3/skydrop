@@ -3,7 +3,12 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Fleet</h1>
-    <a href="{{ url_for('fleet.seed_drones') }}" class="btn btn-primary">Seed Starter Drones</a>
+
+    {% if current_user.is_authenticated and current_user.is_admin %}
+        <a href="{{ url_for('fleet.seed_drones') }}" class="btn btn-primary">
+            Seed Starter Drones
+        </a>
+    {% endif %}
 </div>
 
 <div class="card p-3">

@@ -33,21 +33,29 @@
                     <a class="nav-link" href="{{ url_for('map.operations_map') }}">Map</a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('dashboard.home') }}">Dashboard</a>
-                </li>
+                {% if current_user.is_authenticated and current_user.is_staff %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard.home') }}">Dashboard</a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('deliveries.delivery_list') }}">Deliveries</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('deliveries.delivery_list') }}">Deliveries</a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('fleet.fleet_list') }}">Fleet</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('fleet.fleet_list') }}">Fleet</a>
+                    </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('dispatch.dispatch_board') }}">Dispatch</a>
-                </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dispatch.dispatch_board') }}">Dispatch</a>
+                    </li>
+                {% endif %}
+
+                {% if current_user.is_authenticated and current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.user_list') }}">Admin</a>
+                    </li>
+                {% endif %}
 
                 {% if current_user.is_authenticated %}
                     <li class="nav-item ms-lg-2">
@@ -109,8 +117,11 @@
                 <div class="footer-links d-flex flex-wrap justify-content-md-end gap-3">
                     <a href="{{ url_for('main.home') }}">Home</a>
                     <a href="{{ url_for('map.operations_map') }}">Map</a>
-                    <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
-                    <a href="{{ url_for('dispatch.dispatch_board') }}">Dispatch</a>
+
+                    {% if current_user.is_authenticated and current_user.is_staff %}
+                        <a href="{{ url_for('dashboard.home') }}">Dashboard</a>
+                        <a href="{{ url_for('dispatch.dispatch_board') }}">Dispatch</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

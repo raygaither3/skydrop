@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import render_template
 from config import Config
 from .extensions import db, login_manager
 import os
@@ -18,6 +19,10 @@ def create_app():
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
+    
+    @app.errorhandler(403)
+    def forbidden(error):
+        return render_template("errors/403.html"), 403
 
     from .main.routes import main_bp
     from .auth.routes import auth_bp
@@ -26,7 +31,9 @@ def create_app():
     from .fleet.routes import fleet_bp
     from .dispatch.routes import dispatch_bp
     from .map.routes import map_bp
+    from .admin.routes import admin_bp
 
+    app.register_blueprint(admin_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(dashboard_bp)

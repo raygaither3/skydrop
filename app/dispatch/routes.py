@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from flask import Blueprint, flash, redirect, render_template, url_for
-from flask_login import login_required
 
 from app.extensions import db
 from app.models.delivery import Delivery
@@ -16,12 +15,13 @@ from app.services.dispatch_service import (
     get_delivery_position,
     get_drone_position,
 )
+from app.utils.decorators import role_required
 
 dispatch_bp = Blueprint("dispatch", __name__, url_prefix="/dispatch")
 
 
 @dispatch_bp.route("/")
-@login_required
+@role_required("admin", "business_staff")
 def dispatch_board():
     pending_deliveries = (
         Delivery.query.filter_by(status="pending")
@@ -69,7 +69,7 @@ def dispatch_board():
 
 
 @dispatch_bp.route("/assign/<int:delivery_id>/<int:drone_id>")
-@login_required
+@role_required("admin", "business_staff")
 def assign_mission(delivery_id, drone_id):
     delivery = Delivery.query.get_or_404(delivery_id)
     drone = Drone.query.get_or_404(drone_id)
@@ -105,7 +105,7 @@ def assign_mission(delivery_id, drone_id):
 
 
 @dispatch_bp.route("/auto-assign/<int:delivery_id>")
-@login_required
+@role_required("admin", "business_staff")
 def auto_assign_mission(delivery_id):
     delivery = Delivery.query.get_or_404(delivery_id)
 
@@ -145,7 +145,7 @@ def auto_assign_mission(delivery_id):
 
 
 @dispatch_bp.route("/mission/<int:mission_id>")
-@login_required
+@role_required("admin", "business_staff")
 def mission_detail(mission_id):
     mission = Mission.query.get_or_404(mission_id)
 
@@ -165,7 +165,7 @@ def mission_detail(mission_id):
 
 
 @dispatch_bp.route("/mission/<int:mission_id>/launch")
-@login_required
+@role_required("admin", "business_staff")
 def launch_mission(mission_id):
     mission = Mission.query.get_or_404(mission_id)
 
@@ -185,7 +185,7 @@ def launch_mission(mission_id):
 
 
 @dispatch_bp.route("/mission/<int:mission_id>/complete")
-@login_required
+@role_required("admin", "business_staff")
 def complete_mission(mission_id):
     mission = Mission.query.get_or_404(mission_id)
 

@@ -14,7 +14,10 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(email=form.email.data).first()
+        email = form.email.data.strip().lower()
+        name = form.name.data.strip()
+
+        existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash("That email is already registered.", "warning")
             return redirect(url_for("auth.register"))
@@ -22,10 +25,10 @@ def register():
         hashed_password = generate_password_hash(form.password.data)
 
         user = User(
-            name=form.name.data,
-            email=form.email.data,
+            name=name,
+            email=email,
             password_hash=hashed_password,
-            role="admin"
+            role="business_staff"  # ✅ FIXED
         )
 
         db.session.add(user)
@@ -42,7 +45,9 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        email = form.email.data.strip().lower()
+
+        user = User.query.filter_by(email=email).first()
 
         if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user)
