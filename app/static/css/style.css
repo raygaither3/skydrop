@@ -36,14 +36,18 @@ body {
         radial-gradient(circle at top right, rgba(45, 127, 249, 0.12), transparent 28%),
         radial-gradient(circle at bottom left, rgba(46, 212, 122, 0.10), transparent 25%),
         linear-gradient(180deg, #f8fbff 0%, #eef5ff 100%);
-    padding: 5.5rem 0 4.5rem;
+    padding: 4.75rem 0 4.5rem;
 }
 
 .hero-row {
     min-height: 74vh;
+    align-items: flex-start !important;
 }
 
-.hero-eyebrow,
+.hero-copy-col {
+    padding-top: 0.25rem;
+}
+
 .section-tag,
 .visual-label {
     display: inline-block;
@@ -54,16 +58,35 @@ body {
     font-weight: 800;
 }
 
-.hero-logo-wrap {
-    display: flex;
+.hero-intro-badge {
+    display: inline-flex;
     align-items: center;
+    gap: 14px;
+    padding: 14px 20px;
+    margin-bottom: 1.25rem;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid #dbe7f5;
+    border-radius: 999px;
+    box-shadow: 0 12px 30px rgba(15, 27, 45, 0.08);
+    backdrop-filter: blur(8px);
 }
 
-.hero-logo {
-    max-width: 220px;
-    width: 100%;
-    height: auto;
+.hero-badge-logo {
+    height: 42px;
+    width: auto;
     object-fit: contain;
+    display: block;
+}
+
+.hero-eyebrow {
+    display: inline-block;
+    margin: 0;
+    font-size: 1.02rem;
+    font-weight: 800;
+    color: #2d7ff9;
+    letter-spacing: 0.3px;
+    line-height: 1;
+    text-transform: none;
 }
 
 .public-hero-title {
@@ -72,6 +95,8 @@ body {
     font-weight: 800;
     color: #0f1b2d;
     max-width: 650px;
+    margin-top: 0;
+    margin-bottom: 0;
 }
 
 .public-hero-text {
@@ -310,28 +335,6 @@ body {
         linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 }
 
-@media (max-width: 991px) {
-    .public-hero-title {
-        font-size: 2.5rem;
-    }
-
-    .hero-metric-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero-row {
-        min-height: auto;
-    }
-
-    .hero-logo {
-        max-width: 180px;
-    }
-
-    .nav-logo {
-        height: 32px;
-    }
-}
-
 .navbar-toggler {
     border: 1px solid #d7e6fb;
 }
@@ -387,18 +390,6 @@ main {
 .footer-links a:hover {
     color: #2d7ff9;
 }
-
-@media (max-width: 991px) {
-    .navbar-collapse {
-        background: #ffffff;
-        margin-top: 1rem;
-        padding: 1rem;
-        border-radius: 16px;
-        border: 1px solid #dde9f8;
-        box-shadow: 0 14px 35px rgba(17, 34, 58, 0.08);
-    }
-}
-
 
 .auth-container {
     display: flex;
@@ -504,6 +495,55 @@ main {
     text-decoration: underline;
 }
 
+@media (max-width: 991px) {
+    .public-hero {
+        padding: 4rem 0 3.5rem;
+    }
+
+    .hero-row {
+        min-height: auto;
+        align-items: center !important;
+    }
+
+    .hero-copy-col {
+        padding-top: 0;
+    }
+
+    .public-hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-intro-badge {
+        padding: 12px 16px;
+        margin-bottom: 1rem;
+    }
+
+    .hero-badge-logo {
+        height: 36px;
+    }
+
+    .hero-eyebrow {
+        font-size: 0.92rem;
+    }
+
+    .nav-logo {
+        height: 32px;
+    }
+
+    .navbar-collapse {
+        background: #ffffff;
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 16px;
+        border: 1px solid #dde9f8;
+        box-shadow: 0 14px 35px rgba(17, 34, 58, 0.08);
+    }
+}
+
 @media (max-width: 576px) {
     .auth-card {
         padding: 2rem 1.25rem;
@@ -512,5 +552,23 @@ main {
 
     .auth-title {
         font-size: 1.75rem;
+    }
+
+    .public-hero-title {
+        font-size: 2.15rem;
+    }
+
+    .public-hero-text {
+        font-size: 1rem;
+    }
+
+    .hero-intro-badge {
+        width: 100%;
+        justify-content: center;
+        border-radius: 18px;
+    }
+
+    .hero-trust-row span {
+        font-size: 0.85rem;
     }
 }
