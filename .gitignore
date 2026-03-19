@@ -1,6 +1,21 @@
-venv/
-.env
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Flask instance folder
 instance/
-*.db
+
+# Alembic / Flask-Migrate cache
+migrations/__pycache__/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
