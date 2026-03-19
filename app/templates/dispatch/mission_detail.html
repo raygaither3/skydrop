@@ -21,6 +21,14 @@
                 <p><strong>Delivery Order:</strong> {{ mission.delivery.order_number }}</p>
                 <p><strong>Customer:</strong> {{ mission.delivery.customer_name }}</p>
                 <p><strong>Address:</strong> {{ mission.delivery.customer_address }}</p>
+                <p>
+                    <strong>Package Weight:</strong>
+                    {% if mission.delivery.package_weight is not none %}
+                        {{ ((mission.delivery.package_weight or 0) * 2.20462)|round(2) }} lbs
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
                 <p><strong>Priority:</strong> {{ mission.delivery.priority }}</p>
                 <p><strong>Dispatch Score:</strong> {{ mission.dispatch_score or "N/A" }}</p>
                 <p><strong>Distance:</strong> {{ distance_miles or "N/A" }} miles</p>
@@ -31,6 +39,7 @@
                 <p><strong>Hub Coordinates:</strong> {{ hub_lat }}, {{ hub_lng }}</p>
                 <p><strong>Drone Coordinates:</strong> {{ drone_pos[0] }}, {{ drone_pos[1] }}</p>
                 <p><strong>Delivery Coordinates:</strong> {{ delivery_pos[0] }}, {{ delivery_pos[1] }}</p>
+                <p><strong>Saved Route Points:</strong> {{ route_data|length if route_data else 0 }}</p>
             </div>
         </div>
 
@@ -70,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const droneLng = {{ drone_pos[1]|tojson }};
     const deliveryLat = {{ delivery_pos[0]|tojson }};
     const deliveryLng = {{ delivery_pos[1]|tojson }};
+    const routeData = {{ route_data|tojson }};
 
     const map = L.map("mission-map").setView([deliveryLat, deliveryLng], 13);
 
@@ -82,24 +92,43 @@ document.addEventListener("DOMContentLoaded", function () {
     const droneMarker = L.marker([droneLat, droneLng]).addTo(map).bindPopup("Drone");
     const deliveryMarker = L.marker([deliveryLat, deliveryLng]).addTo(map).bindPopup("Delivery");
 
-    const droneToDeliveryLine = L.polyline([
-        [droneLat, droneLng],
-        [deliveryLat, deliveryLng]
-    ]).addTo(map);
+    const mapItems = [hubMarker, droneMarker, deliveryMarker];
 
-    const hubToDeliveryLine = L.polyline([
-        [hubLat, hubLng],
-        [deliveryLat, deliveryLng]
-    ]).addTo(map);
+    if (routeData && routeData.length > 1) {
+        const routeLatLngs = routeData.map(point => [point.lat, point.lng]);
 
-    const group = L.featureGroup([
-        hubMarker,
-        droneMarker,
-        deliveryMarker,
-        droneToDeliveryLine,
-        hubToDeliveryLine
-    ]);
+        const routeLine = L.polyline(routeLatLngs, {
+            weight: 5
+        }).addTo(map);
 
+        mapItems.push(routeLine);
+
+        routeData.forEach(point => {
+            if (point.type !== "origin" && point.type !== "destination") {
+                const label = point.name
+                    ? `${point.type}: ${point.name}`
+                    : point.type;
+
+                const waypointMarker = L.circleMarker([point.lat, point.lng], {
+                    radius: 6
+                }).addTo(map).bindPopup(label);
+
+                mapItems.push(waypointMarker);
+            }
+        });
+    } else {
+        const fallbackLine = L.polyline([
+            [droneLat, droneLng],
+            [deliveryLat, deliveryLng]
+        ], {
+            weight: 5,
+            dashArray: "8, 8"
+        }).addTo(map);
+
+        mapItems.push(fallbackLine);
+    }
+
+    const group = L.featureGroup(mapItems);
     map.fitBounds(group.getBounds().pad(0.2));
 
     setTimeout(() => {

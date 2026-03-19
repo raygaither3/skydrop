@@ -20,10 +20,14 @@
                             </p>
                             <p class="mb-1"><strong>Priority:</strong> {{ delivery.priority }}</p>
                             <p class="mb-2">
-                                <strong>Package Weight:</strong> {{ delivery.package_weight }}
+                                <strong>Package Weight:</strong>
+                                {% if delivery.package_weight is not none %}
+                                    {{ ((delivery.package_weight or 0) * 2.20462)|round(2) }} lbs
+                                {% else %}
+                                    N/A
+                                {% endif %}
                             </p>
 
-                            <!-- Auto Assign (staff + admin) -->
                             {% if current_user.is_staff %}
                                 <div class="mb-3">
                                     <a href="{{ url_for('dispatch.auto_assign_mission', delivery_id=delivery.id) }}"
@@ -98,7 +102,15 @@
                             <h6 class="mb-1">Mission #{{ mission.id }}</h6>
                             <p class="mb-1"><strong>Drone:</strong> {{ mission.drone.name }}</p>
                             <p class="mb-1"><strong>Delivery:</strong> {{ mission.delivery.order_number }}</p>
-                            <p class="mb-2"><strong>Status:</strong> {{ mission.status }}</p>
+                            <p class="mb-1">
+                                <strong>Package Weight:</strong>
+                                {% if mission.delivery.package_weight is not none %}
+                                    {{ ((mission.delivery.package_weight or 0) * 2.20462)|round(2) }} lbs
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </p>
+                            <p class="mb-2"><strong>Status:</strong> {{ mission.status.replace('_', ' ').title() }}</p>
 
                             <a href="{{ url_for('dispatch.mission_detail', mission_id=mission.id) }}"
                                class="btn btn-outline-secondary btn-sm">

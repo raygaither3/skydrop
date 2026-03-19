@@ -1,8 +1,9 @@
-from flask import Flask
-from flask import render_template
-from config import Config
-from .extensions import db, login_manager
 import os
+
+from flask import Flask, render_template
+
+from config import Config
+from .extensions import db, login_manager, migrate
 
 
 def create_app():
@@ -13,13 +14,22 @@ def create_app():
 
     db.init_app(app)
     login_manager.init_app(app)
+    migrate.init_app(app, db)
 
-    from .models import User, Delivery, Drone, Mission
+    from .models import (
+        User,
+        Delivery,
+        Drone,
+        Mission,
+        HighwayNode,
+        HighwayEdge,
+        NoFlyZone,
+    )
 
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
-    
+
     @app.errorhandler(403)
     def forbidden(error):
         return render_template("errors/403.html"), 403

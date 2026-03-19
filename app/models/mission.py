@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from app.extensions import db
 
 
@@ -7,7 +8,12 @@ class Mission(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    delivery_id = db.Column(db.Integer, db.ForeignKey("deliveries.id"), nullable=False, unique=True)
+    delivery_id = db.Column(
+        db.Integer,
+        db.ForeignKey("deliveries.id"),
+        nullable=False,
+        unique=True,
+    )
     drone_id = db.Column(db.Integer, db.ForeignKey("drones.id"), nullable=False)
 
     status = db.Column(db.String(50), default="assigned", nullable=False, index=True)
@@ -19,6 +25,7 @@ class Mission(db.Model):
 
     dispatch_score = db.Column(db.Float, nullable=True)
     dispatch_notes = db.Column(db.String(255), nullable=True)
+    route_data = db.Column(db.JSON, nullable=True)
 
     delivery = db.relationship("Delivery", back_populates="mission")
     drone = db.relationship("Drone", back_populates="missions")

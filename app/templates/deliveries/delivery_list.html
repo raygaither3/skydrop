@@ -32,7 +32,13 @@
                             <td>{{ delivery.order_number }}</td>
                             <td>{{ delivery.customer_name }}</td>
                             <td>{{ delivery.customer_address }}</td>
-                            <td>{{ delivery.package_weight }} lbs</td>
+                            <td>
+                                {% if delivery.package_weight is not none %}
+                                    {{ ((delivery.package_weight or 0) * 2.20462)|round(2) }} lbs
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
                             <td>
                                 <span class="badge 
                                     {% if delivery.status == 'pending' %}bg-secondary

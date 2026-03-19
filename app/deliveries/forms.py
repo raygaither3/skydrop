@@ -25,7 +25,7 @@ class DeliveryForm(FlaskForm):
     )
 
     package_weight = DecimalField(
-        "Package Weight (kg)",
+        "Package Weight (lbs)",
         validators=[DataRequired()]
     )
 

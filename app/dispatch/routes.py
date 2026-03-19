@@ -15,6 +15,10 @@ from app.services.dispatch_service import (
     get_delivery_position,
     get_drone_position,
 )
+from app.services.highway_service import (
+    calculate_route_distance_m,
+    generate_highway_route,
+)
 from app.utils.decorators import role_required
 
 dispatch_bp = Blueprint("dispatch", __name__, url_prefix="/dispatch")
@@ -87,11 +91,26 @@ def assign_mission(delivery_id, drone_id):
         flash(reason, "danger")
         return redirect(url_for("dispatch.dispatch_board"))
 
+    drone_pos = get_drone_position(drone)
+    delivery_pos = get_delivery_position(delivery)
+
+    route_data = generate_highway_route(
+        drone_pos[0],
+        drone_pos[1],
+        delivery_pos[0],
+        delivery_pos[1],
+    )
+    route_distance_m = calculate_route_distance_m(route_data)
+
     mission = Mission(
         delivery_id=delivery.id,
         drone_id=drone.id,
         status="assigned",
-        dispatch_notes="Manually assigned by dispatcher."
+        dispatch_notes=(
+            f"Manually assigned by dispatcher. "
+            f"Planned highway route distance: {round(route_distance_m, 1)} m."
+        ),
+        route_data=route_data,
     )
 
     delivery.status = "assigned"
@@ -123,12 +142,26 @@ def auto_assign_mission(delivery_id):
         flash("No suitable drone is currently available.", "warning")
         return redirect(url_for("dispatch.dispatch_board"))
 
+    drone_pos = get_drone_position(best_drone)
+    delivery_pos = get_delivery_position(delivery)
+
+    route_data = generate_highway_route(
+        drone_pos[0],
+        drone_pos[1],
+        delivery_pos[0],
+        delivery_pos[1],
+    )
+    route_distance_m = calculate_route_distance_m(route_data)
+
     mission = Mission(
         delivery_id=delivery.id,
         drone_id=best_drone.id,
         status="assigned",
         dispatch_score=best_score,
-        dispatch_notes=notes
+        dispatch_notes=(
+            f"{notes} Planned highway route distance: {round(route_distance_m, 1)} m."
+        ),
+        route_data=route_data,
     )
 
     delivery.status = "assigned"
@@ -152,6 +185,7 @@ def mission_detail(mission_id):
     drone_pos = get_drone_position(mission.drone)
     delivery_pos = get_delivery_position(mission.delivery)
     distance_miles = calculate_distance_miles(drone_pos, delivery_pos)
+    route_data = mission.route_data or []
 
     return render_template(
         "dispatch/mission_detail.html",
@@ -161,6 +195,7 @@ def mission_detail(mission_id):
         distance_miles=distance_miles,
         hub_lat=HUB_LAT,
         hub_lng=HUB_LNG,
+        route_data=route_data,
     )
 
 

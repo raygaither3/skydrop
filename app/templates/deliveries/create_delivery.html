@@ -57,12 +57,13 @@
 
             <div class="mb-3">
                 {{ form.customer_phone.label(class="form-label") }}
-                {{ form.customer_phone(class="form-control", placeholder="Optional") }}
+                {{ form.customer_phone(class="form-control", placeholder="Customer phone number") }}
             </div>
 
             <div class="mb-3">
                 {{ form.package_weight.label(class="form-label") }}
-                {{ form.package_weight(class="form-control", placeholder="Weight in lbs (optional)") }}
+                {{ form.package_weight(class="form-control", placeholder="Weight in lbs") }}
+                <small class="text-muted">Enter package weight in pounds.</small>
             </div>
 
             <div class="row">

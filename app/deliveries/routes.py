@@ -9,6 +9,8 @@ from .forms import DeliveryForm
 
 deliveries_bp = Blueprint("deliveries", __name__, url_prefix="/deliveries")
 
+LBS_TO_KG = 0.45359237
+
 
 @deliveries_bp.route("/")
 @role_required("admin", "business_staff")
@@ -44,12 +46,15 @@ def create_delivery():
             )
             return render_template("deliveries/create_delivery.html", form=form)
 
+        package_weight_lbs = form.package_weight.data
+        package_weight_kg = float(package_weight_lbs) * LBS_TO_KG
+
         delivery = Delivery(
             order_number=form.order_number.data,
             customer_name=form.customer_name.data,
             customer_address=form.customer_address.data,
             customer_phone=form.customer_phone.data,
-            package_weight=form.package_weight.data,
+            package_weight=package_weight_kg,
             destination_lat=lat,
             destination_lng=lng,
             created_by_id=current_user.id,
