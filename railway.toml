@@ -1,0 +1,3 @@
+[deploy]
+preDeployCommand = ["flask db upgrade"]
+startCommand = "gunicorn run:app"
