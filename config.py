@@ -1,5 +1,7 @@
 import os
 
+import app
+
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
@@ -13,3 +15,5 @@ class Config:
         f"sqlite:///{DB_PATH}"
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+print("DATABASE URI:", app.config["SQLALCHEMY_DATABASE_URI"])
