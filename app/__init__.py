@@ -10,6 +10,8 @@ def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object(Config)
 
+    print("DATABASE URI:", app.config["SQLALCHEMY_DATABASE_URI"])
+
     os.makedirs(app.instance_path, exist_ok=True)
 
     db.init_app(app)
