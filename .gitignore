@@ -23,3 +23,5 @@ migrations/__pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+seed_scripts/
