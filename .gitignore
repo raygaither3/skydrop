@@ -24,4 +24,4 @@ Thumbs.db
 .vscode/
 .idea/
 
-seed_scripts/
+app/seed_scripts/
