@@ -10,7 +10,11 @@
                     <img src="{{ url_for('static', filename='img/skydrop-logo.png') }}"
                          alt="SkyDrop Logo"
                          class="hero-badge-logo">
-                    <span class="hero-eyebrow">Drone Delivery for Lake Charles</span>
+
+                    <div class="hero-intro-text">
+                        <span class="hero-eyebrow">Drone Delivery for Lake Charles</span>
+                        <span class="hero-sub-eyebrow">Built for modern local logistics</span>
+                    </div>
                 </div>
 
                 <h1 class="public-hero-title">
@@ -23,7 +27,7 @@
                     into one fast local delivery platform.
                 </p>
 
-                <div class="d-flex flex-wrap gap-3 mt-4">
+                <div class="d-flex flex-wrap gap-3 mt-4 hero-btn-row">
                     <a href="{{ url_for('map.operations_map') }}" class="btn btn-primary btn-lg public-btn-primary">
                         View Live Operations
                     </a>
