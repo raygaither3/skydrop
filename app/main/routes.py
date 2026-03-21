@@ -16,68 +16,71 @@ def health():
     return "ok", 200
 
 
-# 🔥 TEMP: CREATE / PROMOTE ADMIN
-@main_bp.route("/setup-admin-temp")
-def setup_admin_temp():
-    email = "raygaither3@gmail.com"
-    password = "test123"
+@main_bp.route("/seed-drones-temp")
+def seed_drones_temp():
+    from datetime import datetime
+    from app.models import Drone
+    from app.extensions import db
 
-    existing = User.query.filter_by(email=email).first()
+    # Clear only drones (safe)
+    db.session.query(Drone).delete()
 
-    if existing:
-        existing.name = "Ray Gaither"
-        existing.role = "admin"
-        existing.password_hash = generate_password_hash(password)
-        db.session.commit()
-        return "✅ Existing user updated to admin"
-
-    user = User(
-        name="Ray Gaither",
-        email=email,
-        password_hash=generate_password_hash(password),
-        role="admin"
-    )
-
-    db.session.add(user)
-    db.session.commit()
-
-    return "✅ Admin created"
-
-
-# 🔥 TEMP: SEED HIGHWAYS
-@main_bp.route("/seed-highways-temp")
-def seed_highways_temp():
-    db.session.query(HighwayEdge).delete()
-    db.session.query(HighwayNode).delete()
-    db.session.query(NoFlyZone).delete()
-
-    nodes = [
-        HighwayNode(name="Hub", latitude=30.2266, longitude=-93.2174, node_type="hub", is_active=True),
-        HighwayNode(name="Downtown", latitude=30.2230, longitude=-93.2160, node_type="waypoint", is_active=True),
-        HighwayNode(name="Mall", latitude=30.2050, longitude=-93.2400, node_type="waypoint", is_active=True),
-        HighwayNode(name="Hospital", latitude=30.2105, longitude=-93.2210, node_type="priority", is_active=True),
+    drones = [
+        Drone(
+            name="SkyDrop Alpha",
+            model="Tarot X6",
+            status="idle",
+            battery_level=100,
+            payload_capacity=2.5,
+            current_lat=30.2266,
+            current_lng=-93.2174,
+            home_lat=30.2266,
+            home_lng=-93.2174,
+            is_active=True,
+            last_seen=datetime.utcnow()
+        ),
+        Drone(
+            name="SkyDrop Beta",
+            model="Tarot X6",
+            status="charging",
+            battery_level=65,
+            payload_capacity=2.5,
+            current_lat=30.2300,
+            current_lng=-93.2200,
+            home_lat=30.2266,
+            home_lng=-93.2174,
+            is_active=True,
+            last_seen=datetime.utcnow()
+        ),
+        Drone(
+            name="SkyDrop Gamma",
+            model="Tarot X6",
+            status="in_transit",
+            battery_level=78,
+            payload_capacity=2.5,
+            current_lat=30.2100,
+            current_lng=-93.2000,
+            home_lat=30.2266,
+            home_lng=-93.2174,
+            is_active=True,
+            last_seen=datetime.utcnow()
+        ),
+        Drone(
+            name="SkyDrop Delta",
+            model="Tarot X6",
+            status="maintenance",
+            battery_level=40,
+            payload_capacity=2.5,
+            current_lat=30.2400,
+            current_lng=-93.2300,
+            home_lat=30.2266,
+            home_lng=-93.2174,
+            is_active=False,
+            last_seen=datetime.utcnow()
+        ),
     ]
 
-    db.session.add_all(nodes)
+    db.session.add_all(drones)
     db.session.commit()
 
-    edges = [
-        HighwayEdge(start_node_id=nodes[0].id, end_node_id=nodes[1].id, distance_m=400, max_speed_mps=15, priority=1, is_active=True, is_bidirectional=True),
-        HighwayEdge(start_node_id=nodes[1].id, end_node_id=nodes[2].id, distance_m=2500, max_speed_mps=15, priority=2, is_active=True, is_bidirectional=True),
-        HighwayEdge(start_node_id=nodes[0].id, end_node_id=nodes[3].id, distance_m=1800, max_speed_mps=20, priority=1, is_active=True, is_bidirectional=True),
-    ]
-
-    db.session.add_all(edges)
-
-    zone = NoFlyZone(
-        name="Airport Zone",
-        center_lat=30.1266,
-        center_lng=-93.2230,
-        radius_m=3000,
-        is_active=True
-    )
-
-    db.session.add(zone)
-    db.session.commit()
-
-    return "🚀 Highway system seeded"
+    return "🚀 Drones seeded successfully"
