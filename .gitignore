@@ -10,6 +10,10 @@ env/
 
 # Flask instance folder
 instance/
+instance/*.db
+
+# Environment variables
+.env
 
 # Alembic / Flask-Migrate cache
 migrations/__pycache__/
